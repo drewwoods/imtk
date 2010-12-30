@@ -1,5 +1,6 @@
-#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <assert.h>
 #ifndef __APPLE__
 #include <GL/glut.h>
@@ -9,11 +10,30 @@
 #include "imtk.h"
 
 #define CHECKBOX_SIZE	14
+#define TEXTBOX_SIZE	100
 
 enum {
 	FRAME_OUTSET,
 	FRAME_INSET
 };
+
+struct key_node {
+	int key;
+	struct key_node *next;
+};
+
+static void set_active(int id);
+static int set_hot(int id);
+static int hit_test(int x, int y, int w, int h);
+
+static void draw_button(int id, const char *label, int x, int y);
+static void calc_button_size(const char *label, int *wret, int *hret);
+static void draw_checkbox(int id, const char *label, int x, int y, int state);
+static void draw_textbox(int id, const char *text, int x, int y);
+static void draw_string(int x, int y, const char *str);
+static int string_size(const char *str);
+static void draw_frame(int x, int y, int w, int h, int style);
+
 
 /* default colors, can be changed with imtk_set_color */
 static float colors[][4] = {
@@ -26,18 +46,10 @@ static float colors[][4] = {
 
 static int scr_width = 1, scr_height = 1;
 static int mousex, mousey, mouse_bnmask;
-static int active = -1, hot = -1;
+static int active = -1, hot = -1, input = -1;
 
-static void set_active(int id);
-static int set_hot(int id);
-static int hit_test(int x, int y, int w, int h);
+static struct key_node *key_list, *key_tail;
 
-static void draw_button(int id, const char *label, int x, int y);
-static void calc_button_size(const char *label, int *wret, int *hret);
-static void draw_checkbox(int id, const char *label, int x, int y, int state);
-static void draw_string(int x, int y, const char *str);
-static int string_size(const char *str);
-static void draw_frame(int x, int y, int w, int h, int style);
 
 void imtk_set_color(int col, float r, float g, float b)
 {
@@ -50,6 +62,23 @@ void imtk_set_color(int col, float r, float g, float b)
 
 void imtk_inp_key(int key, int state)
 {
+	if(state == IMTK_DOWN) {
+		struct key_node *node;
+
+		if(!(node = malloc(sizeof *node))) {
+			return;
+		}
+		node->key = key;
+		node->next = 0;
+
+		if(key_list) {
+			key_tail->next = node;
+			key_tail = node;
+		} else {
+			key_list = key_tail = node;
+		}
+	}
+
 	glutPostRedisplay();
 }
 
@@ -84,11 +113,24 @@ void imtk_begin(void)
 	glLoadIdentity();
 	glTranslatef(-1, 1, 0);
 	glScalef(2.0 / scr_width, -2.0 / scr_height, 1.0);
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glPushAttrib(GL_ENABLE_BIT);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_LIGHTING);
 }
 
 void imtk_end(void)
 {
+	glPopAttrib();
+
 	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 }
 
@@ -150,6 +192,61 @@ int imtk_checkbox(int id, const char *label, int x, int y, int state)
 
 	draw_checkbox(id, label, x, y, state);
 	return state;
+}
+
+void imtk_textbox(int id, char *textbuf, size_t buf_sz, int x, int y)
+{
+	int len, over = 0;
+
+	assert(id >= 0);
+
+	if(hit_test(x, y, TEXTBOX_SIZE, 20)) {
+		set_hot(id);
+		over = 1;
+	}
+
+	if(mouse_bnmask & (1 << IMTK_LEFT_BUTTON)) {
+		if(over) {
+			set_active(id);
+		}
+	} else {
+		if(active == id) {
+			set_active(-1);
+			if(hot == id && over) {
+				input = id;
+			}
+		}
+	}
+
+	if(input == id) {
+		len = strlen(textbuf);
+		while(key_list) {
+			struct key_node *node = key_list;
+			key_list = key_list->next;
+
+			if(isprint(node->key)) {
+				if(len < buf_sz) {
+					textbuf[len++] = (char)node->key;
+				}
+			} else {
+				switch(node->key) {
+				case '\b':
+					if(len > 0) {
+						textbuf[--len] = 0;
+					}
+					break;
+
+				default:
+					break;
+				}
+			}
+
+			free(node);
+		}
+		key_list = key_tail = 0;
+	}
+
+	draw_textbox(id, textbuf, x, y);
 }
 
 static void set_active(int id)
@@ -238,6 +335,37 @@ static void draw_checkbox(int id, const char *label, int x, int y, int state)
 	}
 
 	draw_string(x + sz + 5, y + sz - 2, label);
+}
+
+static void draw_textbox(int id, const char *text, int x, int y)
+{
+	int strsz = string_size(text);
+
+	if(hit_test(x, y, TEXTBOX_SIZE, 20)) {
+		glColor3fv(colors[IMTK_FOCUS_COLOR]);
+	} else {
+		glColor3fv(colors[IMTK_BASE_COLOR]);
+	}
+
+	glBegin(GL_QUADS);
+	glVertex2f(x, y);
+	glVertex2f(x + TEXTBOX_SIZE, y);
+	glVertex2f(x + TEXTBOX_SIZE, y + 20);
+	glVertex2f(x, y + 20);
+	glEnd();
+
+	glColor3fv(colors[IMTK_TEXT_COLOR]);
+
+	if(input == id) {
+		glBegin(GL_LINES);
+		glVertex2f(x + strsz + 2, y + 2);
+		glVertex2f(x + strsz + 2, y + 18);
+		glEnd();
+	}
+
+	draw_string(x + 2, y + 15, text);
+
+	draw_frame(x, y, TEXTBOX_SIZE, 20, FRAME_INSET);
 }
 
 static void draw_string(int x, int y, const char *str)

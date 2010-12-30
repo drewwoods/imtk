@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 #ifndef __APPLE__
 #include <GL/glut.h>
 #else
@@ -17,9 +18,14 @@ void skeyb_up(int key, int x, int y);
 void mouse(int bn, int state, int x, int y);
 void motion(int x, int y);
 
+int xsz, ysz;
 
 int main(int argc, char **argv)
 {
+	float lpos[] = {-1, 1, 1, 0};
+	float white[] = {1, 1, 1, 1};
+	float color[] = {0.9, 0.8, 0.73, 1};
+
 	glutInitWindowSize(800, 600);
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
@@ -35,40 +41,89 @@ int main(int argc, char **argv)
 	glutMotionFunc(motion);
 	glutPassiveMotionFunc(motion);
 
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glLightfv(GL_LIGHT0, GL_POSITION, lpos);
+
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, white);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 60.0);
+
 	glutMainLoop();
 	return 0;
 }
 
 void disp(void)
 {
-	glClearColor(0.6, 0.6, 0.6, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glViewport(200, 0, xsz - 200, ysz);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0, (float)(xsz - 200) / (float)ysz, 1.0, 1000.0);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glTranslatef(0, 0, -8);
+	glRotatef(25, 1, 0, 0);
+
+	glFrontFace(GL_CW);
+	glutSolidTeapot(1.0);
+	glFrontFace(GL_CCW);
+
+
+	glViewport(0, 0, 200, ysz);
+	imtk_inp_reshape(200, ysz);
 
 	gui();
 
 	glutSwapBuffers();
+	assert(glGetError() == GL_NO_ERROR);
 }
 
 void gui(void)
 {
 	static int bnshow;
+	static char textbuf[256];
+	static char textbuf2[256];
 
 	imtk_begin();
 
-	if(imtk_button(IMUID, "foobar", 100, 100)) {
-		printf("clicked button 0\n");
+	glBegin(GL_QUADS);
+	glColor3f(0.6, 0.6, 0.6);
+	glVertex2f(0, 0);
+	glVertex2f(200, 0);
+	glVertex2f(200, glutGet(GLUT_WINDOW_HEIGHT));
+	glVertex2f(0, glutGet(GLUT_WINDOW_HEIGHT));
+	glEnd();
+
+	if(imtk_button(IMUID, "red", 30, 50)) {
+		float color[] = {1, 0.4, 0.3, 1};
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
+		glutPostRedisplay();
 	}
-	if(imtk_button(IMUID, "xyzzy", 100, 200)) {
-		printf("clicked button 1\n");
-	}
-	if(imtk_button(IMUID, "Quit", 100, 500)) {
-		exit(0);
+	if(imtk_button(IMUID, "blue", 30, 100)) {
+		float color[] = {0.3, 0.4, 1, 1};
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
+		glutPostRedisplay();
 	}
 
-	if((bnshow = imtk_checkbox(IMUID, "show hidden button", 100, 260, bnshow))) {
-		if(imtk_button(IMUID, "I was hidden!", 130, 300)) {
-			printf("you clicked the hidden button!\n");
+	imtk_textbox(IMUID, textbuf, sizeof textbuf, 30, 200);
+	imtk_textbox(IMUID, textbuf2, sizeof textbuf2, 30, 250);
+
+	if((bnshow = imtk_checkbox(IMUID, "show hidden button", 30, 300, bnshow))) {
+		if(imtk_button(IMUID, "yellow", 50, 340)) {
+			float color[] = {0.8, 0.75, 0.3, 1};
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
+			glutPostRedisplay();
 		}
+	}
+
+	if(imtk_button(IMUID, "Quit", 30, 500)) {
+		exit(0);
 	}
 
 	imtk_end();
@@ -76,13 +131,10 @@ void gui(void)
 
 void reshape(int x, int y)
 {
-	glViewport(0, 0, x, y);
-	imtk_inp_reshape(x, y);
+	xsz = x;
+	ysz = y;
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glTranslatef(-1, -1, 0);
-	glScalef(2.0 / x, 2.0 / y, 1.0);
+	glViewport(0, 0, x, y);
 }
 
 void keyb(unsigned char key, int x, int y)
