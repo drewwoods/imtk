@@ -1,6 +1,16 @@
 #ifndef IMTK_H_
 #define IMTK_H_
 
+#define IMUID	(65536 + __LINE__)
+
+enum {
+	IMTK_TEXT_COLOR,
+	IMTK_BASE_COLOR,
+	IMTK_FOCUS_COLOR,
+	IMTK_BEVEL_LIT_COLOR,
+	IMTK_BEVEL_SHAD_COLOR
+};
+
 /* key/button state enum */
 enum {
 	IMTK_UP,
@@ -13,6 +23,8 @@ enum {
 	IMTK_RIGHT_BUTTON
 };
 
+void imtk_set_color(int col, float r, float g, float b);
+
 void imtk_inp_key(int key, int state);
 void imtk_inp_mouse(int bn, int state);
 void imtk_inp_motion(int x, int y);
@@ -22,5 +34,6 @@ void imtk_begin(void);
 void imtk_end(void);
 
 int imtk_button(int id, const char *label, int x, int y);
+int imtk_checkbox(int id, const char *label, int x, int y, int state);
 
 #endif	/* IMTK_H_ */

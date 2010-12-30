@@ -8,6 +8,7 @@
 #include "imtk.h"
 
 void disp(void);
+void gui(void);
 void reshape(int x, int y);
 void keyb(unsigned char key, int x, int y);
 void keyb_up(unsigned char key, int x, int y);
@@ -40,20 +41,37 @@ int main(int argc, char **argv)
 
 void disp(void)
 {
+	glClearColor(0.6, 0.6, 0.6, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	gui();
+
+	glutSwapBuffers();
+}
+
+void gui(void)
+{
+	static int bnshow;
 
 	imtk_begin();
 
-	if(imtk_button(0, "foobar", 100, 100)) {
+	if(imtk_button(IMUID, "foobar", 100, 100)) {
 		printf("clicked button 0\n");
 	}
-	if(imtk_button(1, "xyzzy", 100, 200)) {
+	if(imtk_button(IMUID, "xyzzy", 100, 200)) {
 		printf("clicked button 1\n");
+	}
+	if(imtk_button(IMUID, "Quit", 100, 500)) {
+		exit(0);
+	}
+
+	if((bnshow = imtk_checkbox(IMUID, "show hidden button", 100, 260, bnshow))) {
+		if(imtk_button(IMUID, "I was hidden!", 130, 300)) {
+			printf("you clicked the hidden button!\n");
+		}
 	}
 
 	imtk_end();
-
-	glutSwapBuffers();
 }
 
 void reshape(int x, int y)
