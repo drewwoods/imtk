@@ -19,6 +19,7 @@ void mouse(int bn, int state, int x, int y);
 void motion(int x, int y);
 
 int xsz, ysz;
+float angle;
 
 int main(int argc, char **argv)
 {
@@ -69,6 +70,7 @@ void disp(void)
 	glLoadIdentity();
 	glTranslatef(0, 0, -8);
 	glRotatef(25, 1, 0, 0);
+	glRotatef(angle, 0, 1, 0);
 
 	glFrontFace(GL_CW);
 	glutSolidTeapot(1.0);
@@ -89,6 +91,7 @@ void gui(void)
 	static int bnshow;
 	static char textbuf[256];
 	static char textbuf2[256];
+	static float val;
 
 	imtk_begin();
 
@@ -121,6 +124,14 @@ void gui(void)
 			glutPostRedisplay();
 		}
 	}
+
+	val = imtk_slider(IMUID, angle, 0.0, 360.0, 30, 390);
+	if(val != angle) {
+		angle = val;
+		glutPostRedisplay();
+	}
+
+	imtk_progress(IMUID, val / 360.0, 30, 420);
 
 	if(imtk_button(IMUID, "Quit", 30, 500)) {
 		exit(0);

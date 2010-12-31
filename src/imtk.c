@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -11,6 +12,9 @@
 
 #define CHECKBOX_SIZE	14
 #define TEXTBOX_SIZE	100
+#define SLIDER_SIZE		100
+#define THUMB_WIDTH		10
+#define THUMB_HEIGHT	20
 
 enum {
 	FRAME_OUTSET,
@@ -30,6 +34,8 @@ static void draw_button(int id, const char *label, int x, int y);
 static void calc_button_size(const char *label, int *wret, int *hret);
 static void draw_checkbox(int id, const char *label, int x, int y, int state);
 static void draw_textbox(int id, const char *text, int x, int y);
+static void draw_slider(int id, float pos, float min, float max, int x, int y);
+static void draw_progress(int id, float pos, int x, int y);
 static void draw_string(int x, int y, const char *str);
 static int string_size(const char *str);
 static void draw_frame(int x, int y, int w, int h, int style);
@@ -45,7 +51,7 @@ static float colors[][4] = {
 };
 
 static int scr_width = 1, scr_height = 1;
-static int mousex, mousey, mouse_bnmask;
+static int mousex, mousey, prevx, mouse_bnmask;
 static int active = -1, hot = -1, input = -1;
 
 static struct key_node *key_list, *key_tail;
@@ -249,9 +255,61 @@ void imtk_textbox(int id, char *textbuf, size_t buf_sz, int x, int y)
 	draw_textbox(id, textbuf, x, y);
 }
 
+float imtk_slider(int id, float pos, float min, float max, int x, int y)
+{
+	int thumb_x, thumb_y, over = 0;
+	float range = max - min;
+
+	assert(id >= 0);
+
+	pos = (pos - min) / range;
+	if(pos < 0.0) pos = 0.0;
+	if(pos > 1.0) pos = 1.0;
+
+	thumb_x = x + SLIDER_SIZE * pos - THUMB_WIDTH / 2;
+	thumb_y = y - THUMB_HEIGHT / 2;
+
+	if(hit_test(thumb_x, thumb_y, THUMB_WIDTH, THUMB_HEIGHT)) {
+		set_hot(id);
+		over = 1;
+	}
+
+	if(mouse_bnmask & (1 << IMTK_LEFT_BUTTON)) {
+		if(over && hot == id) {
+			if(active != id) {
+				prevx = mousex;
+			}
+			set_active(id);
+		}
+	} else {
+		if(active == id) {
+			set_active(-1);
+		}
+	}
+
+	if(active == id) {
+		float dx = (float)(mousex - prevx) / (float)SLIDER_SIZE;
+		pos += dx;
+		prevx = mousex;
+
+		if(pos < 0.0) pos = 0.0;
+		if(pos > 1.0) pos = 1.0;
+	}
+
+	draw_slider(id, pos, min, max, x, y);
+	return pos * range + min;
+}
+
+void imtk_progress(int id, float pos, int x, int y)
+{
+	draw_progress(id, pos, x, y);
+}
+
 static void set_active(int id)
 {
-	active = id;
+	if(id == -1 || hot == id) {
+		active = id;
+	}
 }
 
 static int set_hot(int id)
@@ -366,6 +424,76 @@ static void draw_textbox(int id, const char *text, int x, int y)
 	draw_string(x + 2, y + 15, text);
 
 	draw_frame(x, y, TEXTBOX_SIZE, 20, FRAME_INSET);
+}
+
+static void draw_slider(int id, float pos, float min, float max, int x, int y)
+{
+	float range = max - min;
+	int thumb_x, thumb_y;
+	char buf[32];
+
+	thumb_x = x + SLIDER_SIZE * pos - THUMB_WIDTH / 2;
+	thumb_y = y - THUMB_HEIGHT / 2;
+
+	/* draw trough */
+	glBegin(GL_QUADS);
+	glColor3fv(colors[IMTK_BASE_COLOR]);
+	glVertex2f(x, y - 2);
+	glVertex2f(x + SLIDER_SIZE, y - 2);
+	glVertex2f(x + SLIDER_SIZE, y + 2);
+	glVertex2f(x, y + 2);
+	glEnd();
+	draw_frame(x, y - 2, SLIDER_SIZE, 4, FRAME_INSET);
+
+	if(hit_test(thumb_x, thumb_y, THUMB_WIDTH, THUMB_HEIGHT)) {
+		glColor3fv(colors[IMTK_FOCUS_COLOR]);
+	} else {
+		glColor3fv(colors[IMTK_BASE_COLOR]);
+	}
+
+	/* draw handle */
+	glBegin(GL_QUADS);
+	glVertex2f(thumb_x, thumb_y);
+	glVertex2f(thumb_x + THUMB_WIDTH, thumb_y);
+	glVertex2f(thumb_x + THUMB_WIDTH, thumb_y + THUMB_HEIGHT);
+	glVertex2f(thumb_x, thumb_y + THUMB_HEIGHT);
+	glEnd();
+	draw_frame(thumb_x, thumb_y, THUMB_WIDTH, THUMB_HEIGHT, FRAME_OUTSET);
+
+	/* draw display */
+	sprintf(buf, "%.3f", pos * range + min);
+	glColor3fv(colors[IMTK_TEXT_COLOR]);
+	draw_string(x + SLIDER_SIZE + THUMB_WIDTH / 2 + 2, y + 4, buf);
+}
+
+static void draw_progress(int id, float pos, int x, int y)
+{
+	int bar_size = SLIDER_SIZE * pos;
+
+	if(pos < 0.0) pos = 0.0;
+	if(pos > 1.0) pos = 1.0;
+
+	/* through */
+	glBegin(GL_QUADS);
+	glColor3fv(colors[IMTK_BASE_COLOR]);
+	glVertex2f(x - 1, y - 1);
+	glVertex2f(x + SLIDER_SIZE + 1, y - 1);
+	glVertex2f(x + SLIDER_SIZE + 1, y + 17);
+	glVertex2f(x - 1, y + 17);
+	glEnd();
+	draw_frame(x - 1, y - 1, SLIDER_SIZE + 2, 17, FRAME_INSET);
+
+	if(pos > 0.0) {
+		/* bar */
+		glBegin(GL_QUADS);
+		glColor3fv(colors[IMTK_BASE_COLOR]);
+		glVertex2f(x, y);
+		glVertex2f(x + bar_size, y);
+		glVertex2f(x + bar_size, y + 15);
+		glVertex2f(x, y + 15);
+		glEnd();
+		draw_frame(x, y, bar_size, 15, FRAME_OUTSET);
+	}
 }
 
 static void draw_string(int x, int y, const char *str)

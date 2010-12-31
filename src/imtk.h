@@ -33,9 +33,10 @@ void imtk_inp_reshape(int x, int y);
 void imtk_begin(void);
 void imtk_end(void);
 
-void imtk_window(int id, const char *title, int x, int y, int width, int height);
 int imtk_button(int id, const char *label, int x, int y);
 int imtk_checkbox(int id, const char *label, int x, int y, int state);
 void imtk_textbox(int id, char *textbuf, size_t buf_sz, int x, int y);
+float imtk_slider(int id, float pos, float min, float max, int x, int y);
+void imtk_progress(int id, float pos, int x, int y);
 
 #endif	/* IMTK_H_ */
