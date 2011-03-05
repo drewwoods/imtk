@@ -20,6 +20,7 @@ void motion(int x, int y);
 
 int xsz, ysz;
 float angle;
+int objsel;
 
 int main(int argc, char **argv)
 {
@@ -72,9 +73,24 @@ void disp(void)
 	glRotatef(25, 1, 0, 0);
 	glRotatef(angle, 0, 1, 0);
 
-	glFrontFace(GL_CW);
-	glutSolidTeapot(1.0);
-	glFrontFace(GL_CCW);
+	switch(objsel) {
+	case 0:
+		glFrontFace(GL_CW);
+		glutSolidTeapot(1.0);
+		glFrontFace(GL_CCW);
+		break;
+
+	case 1:
+		glutSolidTorus(0.5, 1, 12, 24);
+		break;
+
+	case 2:
+		glutSolidSphere(1.0, 24, 12);
+		break;
+
+	default:
+		break;
+	}
 
 
 	glViewport(0, 0, 200, ysz);
@@ -92,6 +108,8 @@ void gui(void)
 	static char textbuf[256];
 	static char textbuf2[256];
 	static float val;
+	static int prev_sel;
+	char *itemlist;
 
 	imtk_begin();
 
@@ -108,11 +126,18 @@ void gui(void)
 		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
 		glutPostRedisplay();
 	}
-	if(imtk_button(IMUID, "blue", 30, 100)) {
+	if(imtk_button(IMUID, "blue", 30, 80)) {
 		float color[] = {0.3, 0.4, 1, 1};
 		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
 		glutPostRedisplay();
 	}
+
+	itemlist = imtk_create_list("teapot", "torus", "sphere", NULL);
+	if((objsel = imtk_listbox(IMUID, itemlist, prev_sel, 30, 120)) != prev_sel) {
+		prev_sel = objsel;
+		glutPostRedisplay();
+	}
+	imtk_free_list(itemlist);
 
 	imtk_textbox(IMUID, textbuf, sizeof textbuf, 30, 200);
 	imtk_textbox(IMUID, textbuf2, sizeof textbuf2, 30, 250);

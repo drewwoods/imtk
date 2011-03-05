@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdarg.h>
 #include <assert.h>
 #ifndef __APPLE__
 #include <GL/glut.h>
@@ -52,7 +53,7 @@ static float colors[][4] = {
 
 static int scr_width = 1, scr_height = 1;
 static int mousex, mousey, prevx, mouse_bnmask;
-static int active = -1, hot = -1, input = -1;
+static int active = -1, hot = -1, input = -1, prev_active = -1;
 
 static struct key_node *key_list, *key_tail;
 
@@ -305,9 +306,84 @@ void imtk_progress(int id, float pos, int x, int y)
 	draw_progress(id, pos, x, y);
 }
 
+int imtk_listbox(int id, const char *list, int sel, int x, int y)
+{
+	int i;
+	assert(id >= 0);
+
+	if(!list) {
+		return -1;
+	}
+
+	if(id & 1) {
+		id++;
+	}
+
+	for(i=0; *list; i++) {
+		if(imtk_button(id + i * 2 + 1, list, x, y + i * 20)) {
+			sel = i;
+		}
+		list += strlen(list) + 1;
+	}
+	return sel;
+}
+
+int imtk_combobox(int id, char *textbuf, size_t buf_sz, const char *list, int sel, int x, int y)
+{
+	imtk_textbox(id + 1, textbuf, buf_sz, x, y);
+	imtk_button(id + 3, "V", x + TEXTBOX_SIZE, y);
+
+	if(prev_active == id + 3) {
+		sel = imtk_listbox(id + 5, list, sel, x, y + 20);
+	}
+	return sel;
+}
+
+char *imtk_create_list(const char *first, ...)
+{
+	int sz;
+	char *buf, *item;
+	va_list ap;
+
+	if(!first) {
+		return 0;
+	}
+
+	sz = strlen(first) + 2;
+	if(!(buf = malloc(sz))) {
+		return 0;
+	}
+	memcpy(buf, first, sz - 2);
+	buf[sz - 1] = buf[sz - 2] = 0;
+
+	va_start(ap, first);
+	while((item = va_arg(ap, char*))) {
+		int len = strlen(item);
+		char *tmp = realloc(buf, sz + len + 1);
+		if(!tmp) {
+			free(buf);
+			return 0;
+		}
+		buf = tmp;
+
+		memcpy(buf + sz - 1, item, len);
+		sz += len + 1;
+		buf[sz - 1] = buf[sz - 2] = 0;
+	}
+	va_end(ap);
+
+	return buf;
+}
+
+void imtk_free_list(char *list)
+{
+	free(list);
+}
+
 static void set_active(int id)
 {
 	if(id == -1 || hot == id) {
+		prev_active = active;
 		active = id;
 	}
 }
