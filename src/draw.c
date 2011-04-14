@@ -27,6 +27,19 @@ float *imtk_get_color(int col)
 	return colors[col];
 }
 
+void imtk_draw_rect(int x, int y, int w, int h, float *color_rgba)
+{
+	glBegin(GL_QUADS);
+	if(color_rgba) {
+		glColor4fv(color_rgba);
+	}
+	glVertex2f(x, y);
+	glVertex2f(x + w, y);
+	glVertex2f(x + w, y + h);
+	glVertex2f(x, y + h);
+	glEnd();
+}
+
 void imtk_draw_frame(int x, int y, int w, int h, int style)
 {
 	float tcol[4], bcol[4];

@@ -43,18 +43,13 @@ static void draw_button(int id, const char *label, int x, int y)
 
 	calc_button_size(label, &width, &height);
 
-	glBegin(GL_QUADS);
 	if(imtk_hit_test(x, y, width, height)) {
 		glColor4fv(imtk_get_color(IMTK_FOCUS_COLOR));
 	} else {
 		glColor4fv(imtk_get_color(IMTK_BASE_COLOR));
 	}
-	glVertex2f(x, y);
-	glVertex2f(x + width, y);
-	glVertex2f(x + width, y + height);
-	glVertex2f(x, y + height);
-	glEnd();
 
+	imtk_draw_rect(x, y, width, height, 0);
 	imtk_draw_frame(x, y, width, height, imtk_is_active(id) ? FRAME_INSET : FRAME_OUTSET);
 
 	glColor4fv(imtk_get_color(IMTK_TEXT_COLOR));

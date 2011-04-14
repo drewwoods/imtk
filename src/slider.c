@@ -73,13 +73,7 @@ static void draw_slider(int id, float pos, float min, float max, int x, int y)
 	thumb_y = y - THUMB_HEIGHT / 2;
 
 	/* draw trough */
-	glBegin(GL_QUADS);
-	glColor4fv(imtk_get_color(IMTK_BASE_COLOR));
-	glVertex2f(x, y - 2);
-	glVertex2f(x + SLIDER_SIZE, y - 2);
-	glVertex2f(x + SLIDER_SIZE, y + 2);
-	glVertex2f(x, y + 2);
-	glEnd();
+	imtk_draw_rect(x, y - 2, SLIDER_SIZE, 4, imtk_get_color(IMTK_BASE_COLOR));
 	imtk_draw_frame(x, y - 2, SLIDER_SIZE, 4, FRAME_INSET);
 
 	if(imtk_hit_test(thumb_x, thumb_y, THUMB_WIDTH, THUMB_HEIGHT)) {
@@ -89,12 +83,7 @@ static void draw_slider(int id, float pos, float min, float max, int x, int y)
 	}
 
 	/* draw handle */
-	glBegin(GL_QUADS);
-	glVertex2f(thumb_x, thumb_y);
-	glVertex2f(thumb_x + THUMB_WIDTH, thumb_y);
-	glVertex2f(thumb_x + THUMB_WIDTH, thumb_y + THUMB_HEIGHT);
-	glVertex2f(thumb_x, thumb_y + THUMB_HEIGHT);
-	glEnd();
+	imtk_draw_rect(thumb_x, thumb_y, THUMB_WIDTH, THUMB_HEIGHT, 0);
 	imtk_draw_frame(thumb_x, thumb_y, THUMB_WIDTH, THUMB_HEIGHT, FRAME_OUTSET);
 
 	/* draw display */

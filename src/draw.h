@@ -23,6 +23,7 @@ enum {
 
 void imtk_set_color(int col, float r, float g, float b, float a);
 float *imtk_get_color(int col);
+void imtk_draw_rect(int x, int y, int w, int h, float *color_rgba);
 void imtk_draw_frame(int x, int y, int w, int h, int style);
 void imtk_draw_string(int x, int y, const char *str);
 int imtk_string_size(const char *str);

@@ -49,13 +49,7 @@ static void draw_checkbox(int id, const char *label, int x, int y, int state)
 		glColor4fv(imtk_get_color(IMTK_BASE_COLOR));
 	}
 
-	glBegin(GL_QUADS);
-	glVertex2f(x, y);
-	glVertex2f(x + sz, y);
-	glVertex2f(x + sz, y + sz);
-	glVertex2f(x, y + sz);
-	glEnd();
-
+	imtk_draw_rect(x, y, sz, sz, 0);
 	imtk_draw_frame(x, y, sz, sz, FRAME_INSET);
 
 	glColor4fv(imtk_get_color(IMTK_TEXT_COLOR));

@@ -72,22 +72,19 @@ static void draw_textbox(int id, const char *text, int x, int y)
 		glColor4fv(imtk_get_color(IMTK_BASE_COLOR));
 	}
 
-	glBegin(GL_QUADS);
-	glVertex2f(x, y);
-	glVertex2f(x + TEXTBOX_SIZE, y);
-	glVertex2f(x + TEXTBOX_SIZE, y + 20);
-	glVertex2f(x, y + 20);
-	glEnd();
-
-	glColor4fv(imtk_get_color(IMTK_TEXT_COLOR));
+	imtk_draw_rect(x, y, TEXTBOX_SIZE, 20, 0);
 
 	if(imtk_has_focus(id)) {
 		glBegin(GL_LINES);
-		glVertex2f(x + strsz + 2, y + 2);
-		glVertex2f(x + strsz + 2, y + 18);
+		glColor4f(0.8, 0.25, 0.18, imtk_get_color(IMTK_TEXT_COLOR)[3]);
+		glVertex2f(x + strsz + 3, y + 2);
+		glVertex2f(x + strsz + 3, y + 18);
+		glVertex2f(x + strsz + 4, y + 2);
+		glVertex2f(x + strsz + 4, y + 18);
 		glEnd();
 	}
 
+	glColor4fv(imtk_get_color(IMTK_TEXT_COLOR));
 	imtk_draw_string(x + 2, y + 15, text);
 
 	imtk_draw_frame(x, y, TEXTBOX_SIZE, 20, FRAME_INSET);
