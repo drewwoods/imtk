@@ -57,10 +57,16 @@ void imtk_inp_motion(int x, int y)
 	imtk_post_redisplay();
 }
 
-void imtk_inp_reshape(int x, int y)
+void imtk_set_viewport(int x, int y)
 {
 	st.scr_width = x;
 	st.scr_height = y;
+}
+
+void imtk_get_viewport(int *width, int *height)
+{
+	if(width) *width = st.scr_width;
+	if(height) *height = st.scr_height;
 }
 
 

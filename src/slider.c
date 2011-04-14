@@ -52,7 +52,7 @@ float imtk_slider(int id, float pos, float min, float max, int x, int y)
 
 		dx = (float)(mousex - prevx) / (float)SLIDER_SIZE;
 		pos += dx;
-		prevx = mousex;
+		imtk_set_prev_mouse(mousex, mousey);
 
 		if(pos < 0.0) pos = 0.0;
 		if(pos > 1.0) pos = 1.0;

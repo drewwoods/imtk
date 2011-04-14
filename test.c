@@ -94,7 +94,7 @@ void disp(void)
 
 
 	glViewport(0, 0, 200, ysz);
-	imtk_inp_reshape(200, ysz);
+	imtk_set_viewport(200, ysz);
 
 	gui();
 
@@ -108,8 +108,8 @@ void gui(void)
 	static char textbuf[256];
 	static char textbuf2[256];
 	static float val;
-	static int prev_sel;
-	char *itemlist;
+	/*static int prev_sel;
+	char *itemlist;*/
 
 	imtk_begin();
 
@@ -132,12 +132,12 @@ void gui(void)
 		glutPostRedisplay();
 	}
 
-	itemlist = imtk_create_list("teapot", "torus", "sphere", NULL);
+	/*itemlist = imtk_create_list("teapot", "torus", "sphere", NULL);
 	if((objsel = imtk_listbox(IMUID, itemlist, prev_sel, 30, 120)) != prev_sel) {
 		prev_sel = objsel;
 		glutPostRedisplay();
 	}
-	imtk_free_list(itemlist);
+	imtk_free_list(itemlist);*/
 
 	imtk_textbox(IMUID, textbuf, sizeof textbuf, 30, 200);
 	imtk_textbox(IMUID, textbuf2, sizeof textbuf2, 30, 250);
