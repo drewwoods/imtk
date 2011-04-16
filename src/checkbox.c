@@ -7,8 +7,7 @@
 #define CHECKBOX_SIZE	14
 
 
-static void draw_checkbox(int id, const char *label, int x, int y, int state);
-
+static void draw_checkbox(int id, const char *label, int x, int y, int state, int over);
 
 int imtk_checkbox(int id, const char *label, int x, int y, int state)
 {
@@ -17,7 +16,7 @@ int imtk_checkbox(int id, const char *label, int x, int y, int state)
 
 	assert(id >= 0);
 
-	if(imtk_hit_test(x, y, sz, sz)) {
+	if(imtk_hit_test(x, y, sz + imtk_string_size(label) + 5, sz)) {
 		imtk_set_hot(id);
 		over = 1;
 	}
@@ -35,15 +34,15 @@ int imtk_checkbox(int id, const char *label, int x, int y, int state)
 		}
 	}
 
-	draw_checkbox(id, label, x, y, state);
+	draw_checkbox(id, label, x, y, state, over);
 	return state;
 }
 
-static void draw_checkbox(int id, const char *label, int x, int y, int state)
+static void draw_checkbox(int id, const char *label, int x, int y, int state, int over)
 {
 	static const int sz = CHECKBOX_SIZE;
 
-	if(imtk_hit_test(x, y, sz, sz)) {
+	if(over) {
 		glColor4fv(imtk_get_color(IMTK_FOCUS_COLOR));
 	} else {
 		glColor4fv(imtk_get_color(IMTK_BASE_COLOR));
