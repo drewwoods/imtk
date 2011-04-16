@@ -9,7 +9,7 @@ LDFLAGS = $(libgl)
 ifeq ($(shell uname -s), Darwin)
 	libgl = -framework OpenGL -framework GLUT
 else
-	libgl = -lGL -lglut
+	libgl = -lGL -lGLU -lglut
 endif
 
 $(bin): $(obj)
