@@ -20,6 +20,17 @@ enum {
 	IMTK_RIGHT_BUTTON
 };
 
+enum {
+	IMTK_TEXT_COLOR,
+	IMTK_BASE_COLOR,
+	IMTK_FOCUS_COLOR,
+	IMTK_BEVEL_LIT_COLOR,
+	IMTK_BEVEL_SHAD_COLOR,
+	IMTK_CURSOR_COLOR,
+	IMTK_SELECTION_COLOR,
+	IMTK_CHECK_COLOR
+};
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,6 +49,7 @@ void imtk_post_redisplay(void);
 void imtk_begin(void);
 void imtk_end(void);
 
+void imtk_label(const char *str, int x, int y);
 int imtk_button(int id, const char *label, int x, int y);
 int imtk_checkbox(int id, const char *label, int x, int y, int state);
 void imtk_textbox(int id, char *textbuf, size_t buf_sz, int x, int y);
@@ -51,6 +63,13 @@ int imtk_combobox(int id, char *textbuf, size_t buf_sz, const char *list, int se
 /* helper functions to create and destroy item lists for listboxes and comboboxes */
 char *imtk_create_list(const char *first, ...);
 void imtk_free_list(char *list);
+
+/* defined in draw.c */
+void imtk_set_color(int col, float r, float g, float b, float a);
+void imtk_set_alpha(float a);
+float imtk_get_alpha(void);
+void imtk_set_bevel_width(float b);
+float imtk_get_bevel_width(void);
 
 #ifdef __cplusplus
 }

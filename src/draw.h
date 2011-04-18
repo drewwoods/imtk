@@ -6,22 +6,14 @@
 #else
 #include <GLUT/glut.h>
 #endif
-
-enum {
-	IMTK_TEXT_COLOR,
-	IMTK_BASE_COLOR,
-	IMTK_FOCUS_COLOR,
-	IMTK_BEVEL_LIT_COLOR,
-	IMTK_BEVEL_SHAD_COLOR
-};
-
+#include "imtk.h"
 
 enum {
 	FRAME_OUTSET,
 	FRAME_INSET
 };
 
-void imtk_set_color(int col, float r, float g, float b, float a);
+/*void imtk_set_color(int col, float r, float g, float b, float a); in imtk.h */
 float *imtk_get_color(int col);
 void imtk_draw_rect(int x, int y, int w, int h, float *color_rgba);
 void imtk_draw_frame(int x, int y, int w, int h, int style);

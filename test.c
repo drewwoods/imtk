@@ -53,6 +53,9 @@ int main(int argc, char **argv)
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, white);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 60.0);
 
+	/*imtk_set_color(IMTK_BEVEL_LIT_COLOR, 0.3, 0.3, 0.3, 0.5);
+	imtk_set_color(IMTK_BEVEL_SHAD_COLOR, 0.3, 0.3, 0.3, 0.5);*/
+
 	glutMainLoop();
 	return 0;
 }
@@ -61,15 +64,31 @@ void disp(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glViewport(200, 0, xsz - 200, ysz);
-
-	glMatrixMode(GL_PROJECTION);
+	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluPerspective(45.0, (float)(xsz - 200) / (float)ysz, 1.0, 1000.0);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glPushAttrib(GL_ENABLE_BIT);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_DEPTH_TEST);
+
+	glBegin(GL_QUADS);
+	glColor3f(0.3, 0.4, 0.8);
+	glVertex2f(-1, -1);
+	glVertex2f(1, -1);
+	glColor3f(0.7, 0.3, 0.2);
+	glVertex2f(1, 1);
+	glVertex2f(-1, 1);
+	glEnd();
+
+	glPopAttrib();
+	glPopMatrix();
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glTranslatef(0, 0, -8);
+	glTranslatef(0, 0, -4);
 	glRotatef(25, 1, 0, 0);
 	glRotatef(angle, 0, 1, 0);
 
@@ -93,9 +112,6 @@ void disp(void)
 	}
 
 
-	glViewport(0, 0, 200, ysz);
-	imtk_set_viewport(200, ysz);
-
 	gui();
 
 	glutSwapBuffers();
@@ -113,13 +129,13 @@ void gui(void)
 
 	imtk_begin();
 
-	glBegin(GL_QUADS);
+	/*glBegin(GL_QUADS);
 	glColor3f(0.6, 0.6, 0.6);
 	glVertex2f(0, 0);
 	glVertex2f(200, 0);
 	glVertex2f(200, glutGet(GLUT_WINDOW_HEIGHT));
 	glVertex2f(0, glutGet(GLUT_WINDOW_HEIGHT));
-	glEnd();
+	glEnd();*/
 
 	if(imtk_button(IMUID, "red", 30, 50)) {
 		float color[] = {1, 0.4, 0.3, 1};
@@ -158,6 +174,9 @@ void gui(void)
 
 	imtk_progress(IMUID, val / 360.0, 30, 420);
 
+	imtk_label("alpha:", 24, 473);
+	imtk_set_alpha(imtk_slider(IMUID, imtk_get_alpha(), 0.0, 1.0, 60, 470));
+
 	if(imtk_button(IMUID, "Quit", 30, 500)) {
 		exit(0);
 	}
@@ -171,6 +190,11 @@ void reshape(int x, int y)
 	ysz = y;
 
 	glViewport(0, 0, x, y);
+	imtk_set_viewport(x, y);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0, (float)xsz / (float)ysz, 1.0, 1000.0);
 }
 
 void keyb(unsigned char key, int x, int y)

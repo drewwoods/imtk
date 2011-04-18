@@ -41,6 +41,21 @@ int imtk_checkbox(int id, const char *label, int x, int y, int state)
 static void draw_checkbox(int id, const char *label, int x, int y, int state, int over)
 {
 	static const int sz = CHECKBOX_SIZE;
+	static float v[][2] = {
+		{-0.2, 0.63},	/* 0 */
+		{0.121, 0.325},	/* 1 */
+		{0.15, 0.5},	/* 2 */
+		{0.28, 0.125},	/* 3 */
+		{0.38, 0.33},	/* 4 */
+		{0.42, -0.122},	/* 5 */
+		{0.58, 0.25},	/* 6 */
+		{0.72, 0.52},	/* 7 */
+		{0.625, 0.65},	/* 8 */
+		{0.89, 0.78},	/* 9 */
+		{0.875, 0.92},	/* 10 */
+		{1.13, 1.145}	/* 11 */
+	};
+#define TRI(a, b, c)	(glVertex2fv(v[a]), glVertex2fv(v[b]), glVertex2fv(v[c]))
 
 	if(over) {
 		glColor4fv(imtk_get_color(IMTK_FOCUS_COLOR));
@@ -53,19 +68,29 @@ static void draw_checkbox(int id, const char *label, int x, int y, int state, in
 
 	glColor4fv(imtk_get_color(IMTK_TEXT_COLOR));
 	if(state) {
-		glPushAttrib(GL_LINE_BIT);
-		glLineWidth(2);
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+		glTranslatef(x, y + sz, 0);
+		glScalef(sz * 1.2, -sz * 1.3, 1);
 
-		glBegin(GL_LINES);
-		glVertex2f(x + 2, y + 2);
-		glVertex2f(x + sz - 2, y + sz - 2);
-		glVertex2f(x + sz - 2, y + 2);
-		glVertex2f(x + 2, y + sz - 2);
+		glBegin(GL_TRIANGLES);
+		glColor4fv(imtk_get_color(IMTK_CHECK_COLOR));
+		TRI(0, 1, 2);
+		TRI(1, 3, 2);
+		TRI(3, 4, 2);
+		TRI(3, 5, 4);
+		TRI(4, 5, 6);
+		TRI(4, 6, 7);
+		TRI(4, 7, 8);
+		TRI(8, 7, 9);
+		TRI(8, 9, 10);
+		TRI(10, 9, 11);
 		glEnd();
 
-		glPopAttrib();
+		glPopMatrix();
 	}
 
+	glColor4fv(imtk_get_color(IMTK_TEXT_COLOR));
 	imtk_draw_string(x + sz + 5, y + sz - 2, label);
 }
 

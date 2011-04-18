@@ -76,7 +76,7 @@ static void draw_textbox(int id, const char *text, int x, int y)
 
 	if(imtk_has_focus(id)) {
 		glBegin(GL_LINES);
-		glColor4f(0.8, 0.25, 0.18, imtk_get_color(IMTK_TEXT_COLOR)[3]);
+		glColor4fv(imtk_get_color(IMTK_CURSOR_COLOR));
 		glVertex2f(x + strsz + 3, y + 2);
 		glVertex2f(x + strsz + 3, y + 18);
 		glVertex2f(x + strsz + 4, y + 2);
