@@ -24,7 +24,7 @@ static void draw_progress(int id, float pos, int x, int y)
 	memcpy(tcol, imtk_get_color(IMTK_BOTTOM_COLOR), sizeof tcol);
 	memcpy(bcol, imtk_get_color(IMTK_TOP_COLOR), sizeof bcol);
 
-	/* through */
+	/* trough */
 	imtk_draw_rect(x - b, y - b, PROGR_SIZE + b * 2, PROGR_HEIGHT + b * 2, tcol, bcol);
 	imtk_draw_frame(x - b, y - b, PROGR_SIZE + b * 2, PROGR_HEIGHT + b * 2, FRAME_INSET);
 

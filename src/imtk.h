@@ -33,9 +33,7 @@ enum {
 
 #define IMTK_FOCUS_BIT		0x100
 #define IMTK_PRESS_BIT		0x200
-
-#define IMTK_BASE_COLOR		IMTK_BOTTOM_COLOR
-#define IMTK_FOCUS_COLOR	(IMTK_TOP_COLOR | IMTK_FOCUS_BIT)
+#define IMTK_SEL_BIT		0x400
 
 
 #ifdef __cplusplus

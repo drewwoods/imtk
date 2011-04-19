@@ -13,11 +13,11 @@ static float colors[][4] = {
 	{0.9, 0.9, 0.9, 1.0},		/* lit bevel */
 	{0.3, 0.3, 0.3, 1.0},		/* shadowed bevel */
 	{0.8, 0.25, 0.18, 1.0},		/* cursor color */
-	{0.4, 0.5, 0.9, 1.0},		/* selection color */
+	{0.68, 0.85, 1.3, 1.0},		/* selection color */
 	{0.75, 0.1, 0.095, 1.0}		/* check color */
 };
 
-static float focus_factor = 1.1;
+static float focus_factor = 1.15;
 static float press_factor = 0.8;
 static float alpha = 1.0;
 static float bevel = 1.0;
@@ -48,6 +48,11 @@ float *imtk_get_color(unsigned int col)
 		ret[0] *= press_factor;
 		ret[1] *= press_factor;
 		ret[2] *= press_factor;
+	}
+	if(col & IMTK_SEL_BIT) {
+		ret[0] *= colors[IMTK_SELECTION_COLOR][0];
+		ret[1] *= colors[IMTK_SELECTION_COLOR][1];
+		ret[2] *= colors[IMTK_SELECTION_COLOR][2];
 	}
 	ret[3] *= alpha;
 	return ret;
