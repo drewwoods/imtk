@@ -53,8 +53,6 @@ int main(int argc, char **argv)
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, white);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 60.0);
 
-	imtk_set_bevel_width(1);
-
 	glutMainLoop();
 	return 0;
 }
@@ -216,12 +214,12 @@ void keyb_up(unsigned char key, int x, int y)
 
 void skeyb(int key, int x, int y)
 {
-	imtk_inp_key(key, IMTK_DOWN);
+	imtk_inp_key(key | 0x100, IMTK_DOWN);
 }
 
 void skeyb_up(int key, int x, int y)
 {
-	imtk_inp_key(key, IMTK_UP);
+	imtk_inp_key(key | 0x100, IMTK_UP);
 }
 
 void mouse(int bn, int state, int x, int y)

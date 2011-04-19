@@ -7,14 +7,21 @@
 
 #define TEXTBOX_SIZE	100
 
-static void draw_textbox(int id, const char *text, int x, int y, int over);
+static void draw_textbox(int id, char *text, int cursor, int x, int y, int over);
 
 
 void imtk_textbox(int id, char *textbuf, size_t buf_sz, int x, int y)
 {
-	int len, over = 0;
+	int key, len, cursor = 0, over = 0;
 
 	assert(id >= 0);
+
+	len = strlen(textbuf);
+
+	/* HACK! using last element of textbuf for saving cursor position */
+	if((cursor = textbuf[buf_sz - 1]) > len || cursor < 0) {
+		cursor = len;
+	}
 
 	if(imtk_hit_test(x, y, TEXTBOX_SIZE, 20)) {
 		imtk_set_hot(id);
@@ -35,20 +42,59 @@ void imtk_textbox(int id, char *textbuf, size_t buf_sz, int x, int y)
 	}
 
 	if(imtk_has_focus(id)) {
-		int key;
-		len = strlen(textbuf);
-
 		while((key = imtk_get_key()) != -1) {
-			if(isprint(key)) {
-				if(len < buf_sz) {
-					textbuf[len++] = (char)key;
+			if(!(key & 0xff00) && isprint(key)) {
+				if(len < buf_sz - 1) {
+					if(cursor == len) {
+						textbuf[len++] = (char)key;
+						cursor = len;
+					} else {
+						memmove(textbuf + cursor + 1, textbuf + cursor, len - cursor);
+						len++;
+						textbuf[cursor++] = (char)key;
+					}
 				}
 			} else {
+				key &= 0xff;
+
 				switch(key) {
 				case '\b':
-					if(len > 0) {
+					if(cursor > 0) {
+						if(cursor == len) {
+							textbuf[--cursor] = 0;
+						} else {
+							memmove(textbuf + cursor - 1, textbuf + cursor, len - cursor);
+							textbuf[--len] = 0;
+							cursor--;
+						}
+					}
+					break;
+
+				case 127:	/* del */
+					if(cursor < len) {
+						memmove(textbuf + cursor, textbuf + cursor + 1, len - cursor);
 						textbuf[--len] = 0;
 					}
+					break;
+
+				case GLUT_KEY_LEFT:
+					if(cursor > 0) {
+						cursor--;
+					}
+					break;
+
+				case GLUT_KEY_RIGHT:
+					if(cursor < len) {
+						cursor++;
+					}
+					break;
+
+				case GLUT_KEY_HOME:
+					cursor = 0;
+					break;
+
+				case GLUT_KEY_END:
+					cursor = len;
 					break;
 
 				default:
@@ -58,13 +104,13 @@ void imtk_textbox(int id, char *textbuf, size_t buf_sz, int x, int y)
 		}
 	}
 
-	draw_textbox(id, textbuf, x, y, over);
+	textbuf[buf_sz - 1] = cursor;
+	draw_textbox(id, textbuf, cursor, x, y, over);
 }
 
 
-static void draw_textbox(int id, const char *text, int x, int y, int over)
+static void draw_textbox(int id, char *text, int cursor, int x, int y, int over)
 {
-	int strsz = imtk_string_size(text);
 	float tcol[4], bcol[4];
 	unsigned int attr = 0;
 
@@ -77,12 +123,20 @@ static void draw_textbox(int id, const char *text, int x, int y, int over)
 	imtk_draw_rect(x, y, TEXTBOX_SIZE, 20, tcol, bcol);
 
 	if(imtk_has_focus(id)) {
-		glBegin(GL_LINES);
+		int strsz;
+		char tmp;
+
+		tmp = text[cursor];
+		text[cursor] = 0;
+		strsz = imtk_string_size(text);
+		text[cursor] = tmp;
+
+		glBegin(GL_QUADS);
 		glColor4fv(imtk_get_color(IMTK_CURSOR_COLOR));
-		glVertex2f(x + strsz + 3, y + 2);
-		glVertex2f(x + strsz + 3, y + 18);
+		glVertex2f(x + strsz + 2, y + 2);
 		glVertex2f(x + strsz + 4, y + 2);
 		glVertex2f(x + strsz + 4, y + 18);
+		glVertex2f(x + strsz + 2, y + 18);
 		glEnd();
 	}
 
