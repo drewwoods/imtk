@@ -53,8 +53,7 @@ int main(int argc, char **argv)
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, white);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 60.0);
 
-	/*imtk_set_color(IMTK_BEVEL_LIT_COLOR, 0.3, 0.3, 0.3, 0.5);
-	imtk_set_color(IMTK_BEVEL_SHAD_COLOR, 0.3, 0.3, 0.3, 0.5);*/
+	imtk_set_bevel_width(1);
 
 	glutMainLoop();
 	return 0;

@@ -7,7 +7,7 @@
 
 #define TEXTBOX_SIZE	100
 
-static void draw_textbox(int id, const char *text, int x, int y);
+static void draw_textbox(int id, const char *text, int x, int y, int over);
 
 
 void imtk_textbox(int id, char *textbuf, size_t buf_sz, int x, int y)
@@ -58,21 +58,23 @@ void imtk_textbox(int id, char *textbuf, size_t buf_sz, int x, int y)
 		}
 	}
 
-	draw_textbox(id, textbuf, x, y);
+	draw_textbox(id, textbuf, x, y, over);
 }
 
 
-static void draw_textbox(int id, const char *text, int x, int y)
+static void draw_textbox(int id, const char *text, int x, int y, int over)
 {
 	int strsz = imtk_string_size(text);
+	float tcol[4], bcol[4];
+	unsigned int attr = 0;
 
-	if(imtk_hit_test(x, y, TEXTBOX_SIZE, 20)) {
-		glColor4fv(imtk_get_color(IMTK_FOCUS_COLOR));
-	} else {
-		glColor4fv(imtk_get_color(IMTK_BASE_COLOR));
+	if(over) {
+		attr |= IMTK_FOCUS_BIT;
 	}
+	memcpy(tcol, imtk_get_color(IMTK_BOTTOM_COLOR | attr), sizeof tcol);
+	memcpy(bcol, imtk_get_color(IMTK_TOP_COLOR | attr), sizeof bcol);
 
-	imtk_draw_rect(x, y, TEXTBOX_SIZE, 20, 0);
+	imtk_draw_rect(x, y, TEXTBOX_SIZE, 20, tcol, bcol);
 
 	if(imtk_has_focus(id)) {
 		glBegin(GL_LINES);

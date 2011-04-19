@@ -22,14 +22,20 @@ enum {
 
 enum {
 	IMTK_TEXT_COLOR,
-	IMTK_BASE_COLOR,
-	IMTK_FOCUS_COLOR,
+	IMTK_TOP_COLOR,
+	IMTK_BOTTOM_COLOR,
 	IMTK_BEVEL_LIT_COLOR,
 	IMTK_BEVEL_SHAD_COLOR,
 	IMTK_CURSOR_COLOR,
 	IMTK_SELECTION_COLOR,
 	IMTK_CHECK_COLOR
 };
+
+#define IMTK_FOCUS_BIT		0x100
+#define IMTK_PRESS_BIT		0x200
+
+#define IMTK_BASE_COLOR		IMTK_BOTTOM_COLOR
+#define IMTK_FOCUS_COLOR	(IMTK_TOP_COLOR | IMTK_FOCUS_BIT)
 
 
 #ifdef __cplusplus
@@ -65,11 +71,16 @@ char *imtk_create_list(const char *first, ...);
 void imtk_free_list(char *list);
 
 /* defined in draw.c */
-void imtk_set_color(int col, float r, float g, float b, float a);
+void imtk_set_color(unsigned int col, float r, float g, float b, float a);
+float *imtk_get_color(unsigned int col);
 void imtk_set_alpha(float a);
 float imtk_get_alpha(void);
 void imtk_set_bevel_width(float b);
 float imtk_get_bevel_width(void);
+void imtk_set_focus_factor(float fact);
+float imtk_get_focus_factor(void);
+void imtk_set_press_factor(float fact);
+float imtk_get_press_factor(void);
 
 #ifdef __cplusplus
 }

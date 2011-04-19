@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 #include "imtk.h"
 #include "state.h"
@@ -8,7 +9,7 @@
 #define THUMB_WIDTH		10
 #define THUMB_HEIGHT	20
 
-static void draw_slider(int id, float pos, float min, float max, int x, int y);
+static void draw_slider(int id, float pos, float min, float max, int x, int y, int over);
 
 float imtk_slider(int id, float pos, float min, float max, int x, int y)
 {
@@ -58,32 +59,40 @@ float imtk_slider(int id, float pos, float min, float max, int x, int y)
 		if(pos > 1.0) pos = 1.0;
 	}
 
-	draw_slider(id, pos, min, max, x, y);
+	draw_slider(id, pos, min, max, x, y, over);
 	return pos * range + min;
 }
 
 
-static void draw_slider(int id, float pos, float min, float max, int x, int y)
+static void draw_slider(int id, float pos, float min, float max, int x, int y, int over)
 {
 	float range = max - min;
 	int thumb_x, thumb_y;
 	char buf[32];
+	float tcol[4], bcol[4];
+	unsigned int attr = 0;
 
 	thumb_x = x + SLIDER_SIZE * pos - THUMB_WIDTH / 2;
 	thumb_y = y - THUMB_HEIGHT / 2;
 
-	/* draw trough */
-	imtk_draw_rect(x, y - 2, SLIDER_SIZE, 4, imtk_get_color(IMTK_BASE_COLOR));
-	imtk_draw_frame(x, y - 2, SLIDER_SIZE, 4, FRAME_INSET);
+	memcpy(tcol, imtk_get_color(IMTK_BOTTOM_COLOR), sizeof tcol);
+	memcpy(bcol, imtk_get_color(IMTK_TOP_COLOR), sizeof bcol);
 
-	if(imtk_hit_test(thumb_x, thumb_y, THUMB_WIDTH, THUMB_HEIGHT)) {
-		glColor4fv(imtk_get_color(IMTK_FOCUS_COLOR));
-	} else {
-		glColor4fv(imtk_get_color(IMTK_BASE_COLOR));
+	/* draw trough */
+	imtk_draw_rect(x, y - 2, SLIDER_SIZE, 5, tcol, bcol);
+	imtk_draw_frame(x, y - 2, SLIDER_SIZE, 5, FRAME_INSET);
+
+	if(over) {
+		attr |= IMTK_FOCUS_BIT;
 	}
+	if(imtk_is_active(id)) {
+		attr |= IMTK_PRESS_BIT;
+	}
+	memcpy(tcol, imtk_get_color(IMTK_TOP_COLOR | attr), sizeof tcol);
+	memcpy(bcol, imtk_get_color(IMTK_BOTTOM_COLOR | attr), sizeof bcol);
 
 	/* draw handle */
-	imtk_draw_rect(thumb_x, thumb_y, THUMB_WIDTH, THUMB_HEIGHT, 0);
+	imtk_draw_rect(thumb_x, thumb_y, THUMB_WIDTH, THUMB_HEIGHT, tcol, bcol);
 	imtk_draw_frame(thumb_x, thumb_y, THUMB_WIDTH, THUMB_HEIGHT, FRAME_OUTSET);
 
 	/* draw display */

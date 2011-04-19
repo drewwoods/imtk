@@ -1,10 +1,11 @@
+#include <string.h>
 #include <assert.h>
 #include "imtk.h"
 #include "state.h"
 #include "draw.h"
 
 static void calc_button_size(const char *label, int *wret, int *hret);
-static void draw_button(int id, const char *label, int x, int y);
+static void draw_button(int id, const char *label, int x, int y, int over);
 
 int imtk_button(int id, const char *label, int x, int y)
 {
@@ -33,24 +34,26 @@ int imtk_button(int id, const char *label, int x, int y)
 		}
 	}
 
-	draw_button(id, label, x, y);
+	draw_button(id, label, x, y, over);
 	return res;
 }
 
-static void draw_button(int id, const char *label, int x, int y)
+static void draw_button(int id, const char *label, int x, int y, int over)
 {
-	int width, height;
+	float tcol[4], bcol[4];
+	int width, height, active = imtk_is_active(id);
+	unsigned int attr = 0;
+
+	if(over) attr |= IMTK_FOCUS_BIT;
+	if(active) attr |= IMTK_PRESS_BIT;
 
 	calc_button_size(label, &width, &height);
 
-	if(imtk_hit_test(x, y, width, height)) {
-		glColor4fv(imtk_get_color(IMTK_FOCUS_COLOR));
-	} else {
-		glColor4fv(imtk_get_color(IMTK_BASE_COLOR));
-	}
+	memcpy(tcol, imtk_get_color(IMTK_TOP_COLOR | attr), sizeof tcol);
+	memcpy(bcol, imtk_get_color(IMTK_BOTTOM_COLOR | attr), sizeof bcol);
 
-	imtk_draw_rect(x, y, width, height, 0);
-	imtk_draw_frame(x, y, width, height, imtk_is_active(id) ? FRAME_INSET : FRAME_OUTSET);
+	imtk_draw_rect(x, y, width, height, tcol, bcol);
+	imtk_draw_frame(x, y, width, height, active ? FRAME_INSET : FRAME_OUTSET);
 
 	glColor4fv(imtk_get_color(IMTK_TEXT_COLOR));
 	imtk_draw_string(x + 20, y + 15, label);

@@ -1,3 +1,4 @@
+#include <string.h>
 #include <assert.h>
 #include "imtk.h"
 #include "state.h"
@@ -38,32 +39,38 @@ int imtk_checkbox(int id, const char *label, int x, int y, int state)
 	return state;
 }
 
+static float v[][2] = {
+	{-0.2, 0.63},	/* 0 */
+	{0.121, 0.325},	/* 1 */
+	{0.15, 0.5},	/* 2 */
+	{0.28, 0.125},	/* 3 */
+	{0.38, 0.33},	/* 4 */
+	{0.42, -0.122},	/* 5 */
+	{0.58, 0.25},	/* 6 */
+	{0.72, 0.52},	/* 7 */
+	{0.625, 0.65},	/* 8 */
+	{0.89, 0.78},	/* 9 */
+	{0.875, 0.92},	/* 10 */
+	{1.13, 1.145}	/* 11 */
+};
+#define TRI(a, b, c)	(glVertex2fv(v[a]), glVertex2fv(v[b]), glVertex2fv(v[c]))
+
 static void draw_checkbox(int id, const char *label, int x, int y, int state, int over)
 {
 	static const int sz = CHECKBOX_SIZE;
-	static float v[][2] = {
-		{-0.2, 0.63},	/* 0 */
-		{0.121, 0.325},	/* 1 */
-		{0.15, 0.5},	/* 2 */
-		{0.28, 0.125},	/* 3 */
-		{0.38, 0.33},	/* 4 */
-		{0.42, -0.122},	/* 5 */
-		{0.58, 0.25},	/* 6 */
-		{0.72, 0.52},	/* 7 */
-		{0.625, 0.65},	/* 8 */
-		{0.89, 0.78},	/* 9 */
-		{0.875, 0.92},	/* 10 */
-		{1.13, 1.145}	/* 11 */
-	};
-#define TRI(a, b, c)	(glVertex2fv(v[a]), glVertex2fv(v[b]), glVertex2fv(v[c]))
+	unsigned int attr = 0;
+	float tcol[4], bcol[4];
 
 	if(over) {
-		glColor4fv(imtk_get_color(IMTK_FOCUS_COLOR));
-	} else {
-		glColor4fv(imtk_get_color(IMTK_BASE_COLOR));
+		attr |= IMTK_FOCUS_BIT;
 	}
+	if(imtk_is_active(id)) {
+		attr |= IMTK_PRESS_BIT;
+	}
+	memcpy(tcol, imtk_get_color(IMTK_BOTTOM_COLOR | attr), sizeof tcol);
+	memcpy(bcol, imtk_get_color(IMTK_TOP_COLOR | attr), sizeof bcol);
 
-	imtk_draw_rect(x, y, sz, sz, 0);
+	imtk_draw_rect(x, y, sz, sz, tcol, bcol);
 	imtk_draw_frame(x, y, sz, sz, FRAME_INSET);
 
 	glColor4fv(imtk_get_color(IMTK_TEXT_COLOR));
