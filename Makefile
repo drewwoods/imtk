@@ -5,7 +5,7 @@ bin = test
 
 CC = gcc
 CFLAGS = -pedantic -Wall -g -Isrc
-LDFLAGS = $(libgl)
+LDFLAGS = $(libgl) -lm
 
 ifeq ($(shell uname -s), Darwin)
 	libgl = -framework OpenGL -framework GLUT

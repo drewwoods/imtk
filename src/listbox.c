@@ -8,9 +8,21 @@
 #define ITEM_HEIGHT		18
 #define PAD				3
 
+static int list_radio(int id, const char *list, int sel, int x, int y, void (*draw)());
 static void draw_listbox(int id, const char *list, int sel, int x, int y, int width, int nitems, int over);
+static void draw_radio(int id, const char *list, int sel, int x, int y, int width, int nitems, int over);
 
 int imtk_listbox(int id, const char *list, int sel, int x, int y)
+{
+	return list_radio(id, list, sel, x, y, draw_listbox);
+}
+
+int imtk_radiogroup(int id, const char *list, int sel, int x, int y)
+{
+	return list_radio(id, list, sel, x, y, draw_radio);
+}
+
+static int list_radio(int id, const char *list, int sel, int x, int y, void (*draw)())
 {
 	int i, max_width, nitems, over;
 	const char *ptr;
@@ -48,7 +60,7 @@ int imtk_listbox(int id, const char *list, int sel, int x, int y)
 		}
 	}
 
-	draw_listbox(id, list, sel, x, y, max_width, nitems, over);
+	draw(id, list, sel, x, y, max_width, nitems, over);
 	return sel;
 }
 
@@ -126,4 +138,37 @@ static void draw_listbox(int id, const char *list, int sel, int x, int y, int wi
 	}
 
 	imtk_draw_frame(x, y, width, ITEM_HEIGHT * nitems, FRAME_INSET);
+}
+
+static void draw_radio(int id, const char *list, int sel, int x, int y, int width, int nitems, int over)
+{
+	int i;
+	const char *item = list;
+	float rad = ITEM_HEIGHT * 0.5;
+
+	for(i=0; i<nitems; i++) {
+		int item_y = i * ITEM_HEIGHT + y;
+		unsigned int attr = 0;
+		float tcol[4], bcol[4];
+
+		if(over - 1 == i) {
+			attr |= IMTK_FOCUS_BIT;
+		}
+
+		memcpy(tcol, imtk_get_color(IMTK_BOTTOM_COLOR | attr), sizeof tcol);
+		memcpy(bcol, imtk_get_color(IMTK_TOP_COLOR | attr), sizeof bcol);
+
+		imtk_draw_disc(x + rad, item_y + rad, rad * 0.8, 5, tcol, bcol);
+
+		if(i == sel) {
+			attr |= IMTK_SEL_BIT;
+			memcpy(tcol, imtk_get_color(IMTK_TOP_COLOR | attr), sizeof tcol);
+			memcpy(bcol, imtk_get_color(IMTK_BOTTOM_COLOR | attr), sizeof bcol);
+			imtk_draw_disc(x + rad, item_y + ITEM_HEIGHT / 2, rad * 0.6, 5, tcol, bcol);
+		}
+
+		glColor4fv(imtk_get_color(IMTK_TEXT_COLOR));
+		imtk_draw_string(x + rad * 2.0 + 3, item_y + ITEM_HEIGHT - 5, item);
+		item += strlen(item) + 1;
+	}
 }

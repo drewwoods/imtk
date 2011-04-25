@@ -146,7 +146,7 @@ void gui(void)
 	}
 
 	itemlist = imtk_create_list("teapot", "torus", "sphere", NULL);
-	if((objsel = imtk_listbox(IMUID, itemlist, prev_sel, 30, 120)) != prev_sel) {
+	if((objsel = imtk_radiogroup(IMUID, itemlist, prev_sel, 30, 120)) != prev_sel) {
 		prev_sel = objsel;
 		glutPostRedisplay();
 	}
