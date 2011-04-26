@@ -155,15 +155,17 @@ static void draw_radio(int id, const char *list, int sel, int x, int y, int widt
 			attr |= IMTK_FOCUS_BIT;
 		}
 
+		imtk_draw_disc_frame(x + rad, item_y + rad, rad * 0.9, rad * 0.75, 5, FRAME_INSET);
+
 		memcpy(tcol, imtk_get_color(IMTK_BOTTOM_COLOR | attr), sizeof tcol);
 		memcpy(bcol, imtk_get_color(IMTK_TOP_COLOR | attr), sizeof bcol);
-
-		imtk_draw_disc(x + rad, item_y + rad, rad * 0.8, 5, tcol, bcol);
+		imtk_draw_disc(x + rad, item_y + rad, rad * 0.75, 5, tcol, bcol);
 
 		if(i == sel) {
 			attr |= IMTK_SEL_BIT;
 			memcpy(tcol, imtk_get_color(IMTK_TOP_COLOR | attr), sizeof tcol);
 			memcpy(bcol, imtk_get_color(IMTK_BOTTOM_COLOR | attr), sizeof bcol);
+
 			imtk_draw_disc(x + rad, item_y + ITEM_HEIGHT / 2, rad * 0.6, 5, tcol, bcol);
 		}
 

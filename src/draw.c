@@ -116,45 +116,6 @@ void imtk_draw_rect(int x, int y, int w, int h, float *ctop, float *cbot)
 	glEnd();
 }
 
-void imtk_draw_disc(int x, int y, float rad, int subdiv, float *ctop, float *cbot)
-{
-	int i;
-	float t, dtheta, theta = 0.0;
-	float color[4];
-	float cx = (float)x;
-	float cy = (float)y;
-
-	subdiv += 3;
-	dtheta = 2.0 * M_PI / subdiv;
-
-	color[0] = (ctop[0] + cbot[0]) * 0.5;
-	color[1] = (ctop[1] + cbot[1]) * 0.5;
-	color[2] = (ctop[2] + cbot[2]) * 0.5;
-	color[3] = (ctop[3] + cbot[3]) * 0.5;
-
-	glBegin(GL_TRIANGLE_FAN);
-	glColor4fv(color);
-	glVertex2f(cx, cy);
-
-	for(i=0; i<=subdiv; i++) {
-		float vx, vy;
-
-		vx = cx + cos(theta) * rad;
-		vy = cy + sin(theta) * rad;
-		theta += dtheta;
-
-		t = (vy - (cy - rad)) / (2.0 * rad);
-		color[0] = ctop[0] + (cbot[0] - ctop[0]) * t;
-		color[1] = ctop[1] + (cbot[1] - ctop[1]) * t;
-		color[2] = ctop[2] + (cbot[2] - ctop[2]) * t;
-		color[3] = ctop[3] + (cbot[3] - ctop[3]) * t;
-
-		glColor4fv(color);
-		glVertex2f(vx, vy);
-	}
-	glEnd();
-}
-
 void imtk_draw_frame(int x, int y, int w, int h, int style)
 {
 	float tcol[4], bcol[4];
@@ -203,6 +164,93 @@ void imtk_draw_frame(int x, int y, int w, int h, int style)
 	glVertex2f(x + w, y);
 	glVertex2f(x + w, y + h);
 	glVertex2f(x + w - b, y + h - b);
+	glEnd();
+}
+
+void imtk_draw_disc(int x, int y, float rad, int subdiv, float *ctop, float *cbot)
+{
+	int i;
+	float t, dtheta, theta = 0.0;
+	float color[4];
+	float cx = (float)x;
+	float cy = (float)y;
+
+	subdiv += 3;
+	dtheta = 2.0 * M_PI / subdiv;
+
+	color[0] = (ctop[0] + cbot[0]) * 0.5;
+	color[1] = (ctop[1] + cbot[1]) * 0.5;
+	color[2] = (ctop[2] + cbot[2]) * 0.5;
+	color[3] = (ctop[3] + cbot[3]) * 0.5;
+
+	glBegin(GL_TRIANGLE_FAN);
+	glColor4fv(color);
+	glVertex2f(cx, cy);
+
+	for(i=0; i<=subdiv; i++) {
+		float vx, vy;
+
+		vx = cos(theta);
+		vy = sin(theta);
+		theta += dtheta;
+
+		t = (vy + 1.0) / 2.0;
+		color[0] = ctop[0] + (cbot[0] - ctop[0]) * t;
+		color[1] = ctop[1] + (cbot[1] - ctop[1]) * t;
+		color[2] = ctop[2] + (cbot[2] - ctop[2]) * t;
+		color[3] = ctop[3] + (cbot[3] - ctop[3]) * t;
+
+		glColor4fv(color);
+		glVertex2f(cx + vx * rad, cy + vy * rad);
+	}
+	glEnd();
+}
+
+void imtk_draw_disc_frame(int x, int y, float inner, float outer, int subdiv, int style)
+{
+	int i;
+	float t, dtheta, theta = 0.0;
+	float color[4], tcol[4], bcol[4];
+	float cx = (float)x;
+	float cy = (float)y;
+
+	switch(style) {
+	case FRAME_INSET:
+		memcpy(tcol, imtk_get_color(IMTK_BEVEL_SHAD_COLOR), sizeof tcol);
+		memcpy(bcol, imtk_get_color(IMTK_BEVEL_LIT_COLOR), sizeof bcol);
+		break;
+
+	case FRAME_OUTSET:
+	default:
+		memcpy(tcol, imtk_get_color(IMTK_BEVEL_LIT_COLOR), sizeof tcol);
+		memcpy(bcol, imtk_get_color(IMTK_BEVEL_SHAD_COLOR), sizeof bcol);
+	}
+
+	subdiv += 3;
+	dtheta = 2.0 * M_PI / subdiv;
+
+	glBegin(GL_QUAD_STRIP);
+
+	for(i=0; i<=subdiv; i++) {
+		float vx, vy;
+
+		vx = cos(theta);
+		vy = sin(theta);
+
+		t = (vy + 1.0) / 2.0;
+		color[0] = tcol[0] + (bcol[0] - tcol[0]) * t;
+		color[1] = tcol[1] + (bcol[1] - tcol[1]) * t;
+		color[2] = tcol[2] + (bcol[2] - tcol[2]) * t;
+		color[3] = tcol[3] + (bcol[3] - tcol[3]) * t;
+
+		vx = cos(theta - M_PI / 4.0);
+		vy = sin(theta - M_PI / 4.0);
+		theta += dtheta;
+
+		glColor4fv(color);
+		glVertex2f(cx + vx * inner, cy + vy * inner);
+		glVertex2f(cx + vx * outer, cy + vy * outer);
+	}
 	glEnd();
 }
 
