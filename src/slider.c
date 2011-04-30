@@ -18,6 +18,11 @@ float imtk_slider(int id, float pos, float min, float max, int x, int y)
 
 	assert(id >= 0);
 
+	if(x == IMTK_AUTO || y == IMTK_AUTO) {
+		imtk_layout_get_pos(&x, &y);
+	}
+	y += THUMB_HEIGHT / 2;
+
 	imtk_get_mouse(&mousex, &mousey);
 
 	pos = (pos - min) / range;
@@ -60,6 +65,7 @@ float imtk_slider(int id, float pos, float min, float max, int x, int y)
 	}
 
 	draw_slider(id, pos, min, max, x, y, over);
+	imtk_layout_advance(SLIDER_SIZE + THUMB_WIDTH, THUMB_HEIGHT);
 	return pos * range + min;
 }
 

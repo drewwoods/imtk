@@ -29,6 +29,10 @@ static int list_radio(int id, const char *list, int sel, int x, int y, void (*dr
 
 	assert(id >= 0);
 
+	if(x == IMTK_AUTO || y == IMTK_AUTO) {
+		imtk_layout_get_pos(&x, &y);
+	}
+
 	max_width = 0;
 	over = 0;
 
@@ -61,6 +65,7 @@ static int list_radio(int id, const char *list, int sel, int x, int y, void (*dr
 	}
 
 	draw(id, list, sel, x, y, max_width, nitems, over);
+	imtk_layout_advance(max_width, ITEM_HEIGHT * nitems);
 	return sel;
 }
 

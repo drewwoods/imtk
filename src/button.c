@@ -14,6 +14,10 @@ int imtk_button(int id, const char *label, int x, int y)
 
 	assert(id >= 0);
 
+	if(x == IMTK_AUTO || y == IMTK_AUTO) {
+		imtk_layout_get_pos(&x, &y);
+	}
+
 	calc_button_size(label, &w, &h);
 
 	if(imtk_hit_test(x, y, w, h)) {
@@ -35,6 +39,7 @@ int imtk_button(int id, const char *label, int x, int y)
 	}
 
 	draw_button(id, label, x, y, over);
+	imtk_layout_advance(w, h);
 	return res;
 }
 

@@ -2,7 +2,7 @@
 #define IMTK_H_
 
 #include <stdlib.h>
-
+#include <limits.h>
 
 #define IMUID			(__LINE__ << 10)
 #define IMUID_IDX(i)	((__LINE__ << 10) + ((i) << 1))
@@ -31,10 +31,16 @@ enum {
 	IMTK_CHECK_COLOR
 };
 
+enum {
+	IMTK_HORIZONTAL,
+	IMTK_VERTICAL
+};
+
 #define IMTK_FOCUS_BIT		0x100
 #define IMTK_PRESS_BIT		0x200
 #define IMTK_SEL_BIT		0x400
 
+#define IMTK_AUTO			INT_MIN
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,9 +68,17 @@ void imtk_progress(int id, float pos, int x, int y);
 int imtk_listbox(int id, const char *list, int sel, int x, int y);
 int imtk_radiogroup(int id, const char *list, int sel, int x, int y);
 
-/* helper functions to create and destroy item lists for listboxes and comboboxes */
+/* helper functions to create and destroy item lists for listboxes */
 char *imtk_create_list(const char *first, ...);
 void imtk_free_list(char *list);
+
+/* automatic layout */
+void imtk_layout_start(int x, int y, int spacing, int dir);
+void imtk_layout_dir(int dir);
+void imtk_layout_advance(int width, int height);
+void imtk_layout_newline(void);
+void imtk_layout_get_pos(int *x, int *y);
+void imtk_layout_get_bounds(int *bbox);
 
 /* defined in draw.c */
 void imtk_set_color(unsigned int col, float r, float g, float b, float a);

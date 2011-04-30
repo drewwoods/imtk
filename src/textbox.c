@@ -6,6 +6,7 @@
 #include "draw.h"
 
 #define TEXTBOX_SIZE	100
+#define TEXTBOX_HEIGHT	20
 
 static void draw_textbox(int id, char *text, int cursor, int x, int y, int over);
 
@@ -16,6 +17,10 @@ void imtk_textbox(int id, char *textbuf, size_t buf_sz, int x, int y)
 
 	assert(id >= 0);
 
+	if(x == IMTK_AUTO || y == IMTK_AUTO) {
+		imtk_layout_get_pos(&x, &y);
+	}
+
 	len = strlen(textbuf);
 
 	/* HACK! using last element of textbuf for saving cursor position */
@@ -23,7 +28,7 @@ void imtk_textbox(int id, char *textbuf, size_t buf_sz, int x, int y)
 		cursor = len;
 	}
 
-	if(imtk_hit_test(x, y, TEXTBOX_SIZE, 20)) {
+	if(imtk_hit_test(x, y, TEXTBOX_SIZE, TEXTBOX_HEIGHT)) {
 		imtk_set_hot(id);
 		over = 1;
 	}
@@ -106,6 +111,7 @@ void imtk_textbox(int id, char *textbuf, size_t buf_sz, int x, int y)
 
 	textbuf[buf_sz - 1] = cursor;
 	draw_textbox(id, textbuf, cursor, x, y, over);
+	imtk_layout_advance(TEXTBOX_SIZE, TEXTBOX_HEIGHT);
 }
 
 
@@ -120,7 +126,7 @@ static void draw_textbox(int id, char *text, int cursor, int x, int y, int over)
 	memcpy(tcol, imtk_get_color(IMTK_BOTTOM_COLOR | attr), sizeof tcol);
 	memcpy(bcol, imtk_get_color(IMTK_TOP_COLOR | attr), sizeof bcol);
 
-	imtk_draw_rect(x, y, TEXTBOX_SIZE, 20, tcol, bcol);
+	imtk_draw_rect(x, y, TEXTBOX_SIZE, TEXTBOX_HEIGHT, tcol, bcol);
 
 	if(imtk_has_focus(id)) {
 		int strsz;
@@ -143,6 +149,6 @@ static void draw_textbox(int id, char *text, int cursor, int x, int y, int over)
 	glColor4fv(imtk_get_color(IMTK_TEXT_COLOR));
 	imtk_draw_string(x + 2, y + 15, text);
 
-	imtk_draw_frame(x, y, TEXTBOX_SIZE, 20, FRAME_INSET);
+	imtk_draw_frame(x, y, TEXTBOX_SIZE, TEXTBOX_HEIGHT, FRAME_INSET);
 }
 

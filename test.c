@@ -125,6 +125,7 @@ void gui(void)
 	char *itemlist;
 
 	imtk_begin();
+	imtk_layout_start(30, 50, 10, IMTK_VERTICAL);
 
 	/*glBegin(GL_QUADS);
 	glColor3f(0.6, 0.6, 0.6);
@@ -134,47 +135,49 @@ void gui(void)
 	glVertex2f(0, glutGet(GLUT_WINDOW_HEIGHT));
 	glEnd();*/
 
-	if(imtk_button(IMUID, "red", 30, 50)) {
+	if(imtk_button(IMUID, "red", IMTK_AUTO, IMTK_AUTO)) {
 		float color[] = {1, 0.4, 0.3, 1};
 		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
 		glutPostRedisplay();
 	}
-	if(imtk_button(IMUID, "blue", 30, 80)) {
+	if(imtk_button(IMUID, "blue", IMTK_AUTO, IMTK_AUTO)) {
 		float color[] = {0.3, 0.4, 1, 1};
 		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
 		glutPostRedisplay();
 	}
 
 	itemlist = imtk_create_list("teapot", "torus", "sphere", NULL);
-	if((objsel = imtk_radiogroup(IMUID, itemlist, prev_sel, 30, 120)) != prev_sel) {
+	if((objsel = imtk_radiogroup(IMUID, itemlist, prev_sel, IMTK_AUTO, IMTK_AUTO)) != prev_sel) {
 		prev_sel = objsel;
 		glutPostRedisplay();
 	}
 	imtk_free_list(itemlist);
 
-	imtk_textbox(IMUID, textbuf, sizeof textbuf, 30, 200);
-	imtk_textbox(IMUID, textbuf2, sizeof textbuf2, 30, 250);
+	imtk_textbox(IMUID, textbuf, sizeof textbuf, IMTK_AUTO, IMTK_AUTO);
+	imtk_textbox(IMUID, textbuf2, sizeof textbuf2, IMTK_AUTO, IMTK_AUTO);
 
-	if((bnshow = imtk_checkbox(IMUID, "show hidden button", 30, 300, bnshow))) {
-		if(imtk_button(IMUID, "yellow", 50, 340)) {
+	if((bnshow = imtk_checkbox(IMUID, "show hidden button", IMTK_AUTO, IMTK_AUTO, bnshow))) {
+		if(imtk_button(IMUID, "yellow", IMTK_AUTO, IMTK_AUTO)) {
 			float color[] = {0.8, 0.75, 0.3, 1};
 			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
 			glutPostRedisplay();
 		}
 	}
 
-	val = imtk_slider(IMUID, angle, 0.0, 360.0, 30, 390);
+	val = imtk_slider(IMUID, angle, 0.0, 360.0, IMTK_AUTO, IMTK_AUTO);
 	if(val != angle) {
 		angle = val;
 		glutPostRedisplay();
 	}
 
-	imtk_progress(IMUID, val / 360.0, 30, 420);
+	imtk_progress(IMUID, val / 360.0, IMTK_AUTO, IMTK_AUTO);
 
-	imtk_label("alpha:", 24, 473);
-	imtk_set_alpha(imtk_slider(IMUID, imtk_get_alpha(), 0.0, 1.0, 60, 470));
+	imtk_layout_dir(IMTK_HORIZONTAL);
+	imtk_label("alpha:", IMTK_AUTO, IMTK_AUTO);
+	imtk_set_alpha(imtk_slider(IMUID, imtk_get_alpha(), 0.0, 1.0, IMTK_AUTO, IMTK_AUTO));
+	imtk_layout_dir(IMTK_VERTICAL);
 
-	if(imtk_button(IMUID, "Quit", 30, 500)) {
+	if(imtk_button(IMUID, "Quit", IMTK_AUTO, IMTK_AUTO)) {
 		exit(0);
 	}
 

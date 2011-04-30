@@ -13,11 +13,16 @@ static void draw_checkbox(int id, const char *label, int x, int y, int state, in
 int imtk_checkbox(int id, const char *label, int x, int y, int state)
 {
 	int sz = CHECKBOX_SIZE;
-	int over = 0;
+	int full_size, over = 0;
 
 	assert(id >= 0);
 
-	if(imtk_hit_test(x, y, sz + imtk_string_size(label) + 5, sz)) {
+	if(x == IMTK_AUTO || y == IMTK_AUTO) {
+		imtk_layout_get_pos(&x, &y);
+	}
+
+	full_size = sz + imtk_string_size(label) + 5;
+	if(imtk_hit_test(x, y, full_size, sz)) {
 		imtk_set_hot(id);
 		over = 1;
 	}
@@ -36,6 +41,7 @@ int imtk_checkbox(int id, const char *label, int x, int y, int state)
 	}
 
 	draw_checkbox(id, label, x, y, state, over);
+	imtk_layout_advance(full_size, sz);
 	return state;
 }
 

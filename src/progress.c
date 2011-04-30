@@ -9,7 +9,12 @@ static void draw_progress(int id, float pos, int x, int y);
 
 void imtk_progress(int id, float pos, int x, int y)
 {
+	if(x == IMTK_AUTO || y == IMTK_AUTO) {
+		imtk_layout_get_pos(&x, &y);
+	}
+
 	draw_progress(id, pos, x, y);
+	imtk_layout_advance(PROGR_SIZE, PROGR_HEIGHT);
 }
 
 static void draw_progress(int id, float pos, int x, int y)
