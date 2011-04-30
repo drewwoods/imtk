@@ -66,7 +66,7 @@ void imtk_label(const char *str, int x, int y)
 	}
 
 	glColor4fv(imtk_get_color(IMTK_TEXT_COLOR));
-	imtk_draw_string(x, y + 15, str);
+	imtk_draw_string(x, y + 14, str);
 	imtk_layout_advance(imtk_string_size(str), 12);
 }
 
