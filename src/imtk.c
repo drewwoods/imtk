@@ -96,7 +96,6 @@ void imtk_layout_advance(int width, int height)
 {
 	int max_span_y, max_box_y;
 
-	box[2] += width + spacing;
 	span[2] += width + spacing;
 
 	if(height > span[3]) {
@@ -108,6 +107,9 @@ void imtk_layout_advance(int width, int height)
 
 	if(max_span_y > max_box_y) {
 		box[3] = max_span_y - box[1];
+	}
+	if(span[2] > box[2]) {
+		box[2] = span[2];
 	}
 
 	if(layout == IMTK_VERTICAL) {

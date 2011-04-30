@@ -9,11 +9,11 @@
 #define THUMB_WIDTH		10
 #define THUMB_HEIGHT	20
 
-static void draw_slider(int id, float pos, float min, float max, int x, int y, int over);
+static int draw_slider(int id, float pos, float min, float max, int x, int y, int over);
 
 float imtk_slider(int id, float pos, float min, float max, int x, int y)
 {
-	int mousex, mousey, thumb_x, thumb_y, over = 0;
+	int mousex, mousey, thumb_x, thumb_y, txsz, over = 0;
 	float range = max - min;
 
 	assert(id >= 0);
@@ -64,13 +64,13 @@ float imtk_slider(int id, float pos, float min, float max, int x, int y)
 		if(pos > 1.0) pos = 1.0;
 	}
 
-	draw_slider(id, pos, min, max, x, y, over);
-	imtk_layout_advance(SLIDER_SIZE + THUMB_WIDTH, THUMB_HEIGHT);
+	txsz = draw_slider(id, pos, min, max, x, y, over);
+	imtk_layout_advance(SLIDER_SIZE + THUMB_WIDTH + txsz, THUMB_HEIGHT);
 	return pos * range + min;
 }
 
 
-static void draw_slider(int id, float pos, float min, float max, int x, int y, int over)
+static int draw_slider(int id, float pos, float min, float max, int x, int y, int over)
 {
 	float range = max - min;
 	int thumb_x, thumb_y;
@@ -105,5 +105,6 @@ static void draw_slider(int id, float pos, float min, float max, int x, int y, i
 	sprintf(buf, "%.3f", pos * range + min);
 	glColor4fv(imtk_get_color(IMTK_TEXT_COLOR));
 	imtk_draw_string(x + SLIDER_SIZE + THUMB_WIDTH / 2 + 2, y + 4, buf);
+	return imtk_string_size(buf);
 }
 
