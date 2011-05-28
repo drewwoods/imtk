@@ -68,13 +68,19 @@ void imtk_progress(int id, float pos, int x, int y);
 int imtk_listbox(int id, const char *list, int sel, int x, int y);
 int imtk_radiogroup(int id, const char *list, int sel, int x, int y);
 
+int imtk_begin_frame(int id, const char *label, int x, int y);
+void imtk_end_frame(void);
+
 /* helper functions to create and destroy item lists for listboxes */
 char *imtk_create_list(const char *first, ...);
 void imtk_free_list(char *list);
 
 /* automatic layout */
-void imtk_layout_start(int x, int y, int spacing, int dir);
+int imtk_layout_push(void);
+int imtk_layout_pop(void);
+void imtk_layout_start(int x, int y);
 void imtk_layout_dir(int dir);
+void imtk_layout_spacing(int spacing);
 void imtk_layout_advance(int width, int height);
 void imtk_layout_newline(void);
 void imtk_layout_get_pos(int *x, int *y);
