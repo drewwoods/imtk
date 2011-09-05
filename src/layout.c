@@ -1,4 +1,5 @@
 #include <string.h>
+#include <assert.h>
 #include "imtk.h"
 
 struct layout {
@@ -31,15 +32,16 @@ int imtk_layout_pop(void)
 		return -1;
 	}
 	top--;
+	return 0;
 }
 
-void imtk_layout_start(int x, int y, int sp, int dir)
+void imtk_layout_start(int x, int y)
 {
 	st[top].box[0] = st[top].span[0] = x;
 	st[top].box[1] = st[top].span[1] = y;
 	st[top].box[2] = st[top].box[3] = st[top].span[2] = st[top].span[3] = 0;
-	st[top].spacing = sp;
-	st[top].dir = dir;
+/*	st[top].spacing = sp;
+	st[top].dir = dir;*/
 }
 
 void imtk_layout_dir(int dir)
@@ -48,6 +50,11 @@ void imtk_layout_dir(int dir)
 	if(dir == IMTK_VERTICAL) {
 		imtk_layout_newline();
 	}
+}
+
+void imtk_layout_spacing(int spacing)
+{
+	st[top].spacing = spacing;
 }
 
 void imtk_layout_advance(int width, int height)
@@ -78,7 +85,7 @@ void imtk_layout_advance(int width, int height)
 void imtk_layout_newline(void)
 {
 	st[top].span[0] = st[top].box[0];
-	st[top].span[1] = st[top].box[1] + st[top].box[3] + spacing;
+	st[top].span[1] = st[top].box[1] + st[top].box[3] + st[top].spacing;
 	st[top].span[2] = st[top].span[3] = 0;
 }
 

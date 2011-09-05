@@ -125,7 +125,9 @@ void gui(void)
 	char *itemlist;
 
 	imtk_begin();
-	imtk_layout_start(30, 50, 10, IMTK_VERTICAL);
+	imtk_layout_start(30, 50);
+	imtk_layout_spacing(10);
+	imtk_layout_dir(IMTK_VERTICAL);
 
 	/*glBegin(GL_QUADS);
 	glColor3f(0.6, 0.6, 0.6);
