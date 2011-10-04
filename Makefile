@@ -8,8 +8,8 @@ PREFIX = /usr/local
 
 CC = gcc
 AR = ar
-CFLAGS = -pedantic -Wall -g -Isrc
-LDFLAGS = $(libgl) -lm
+CFLAGS = -pedantic -Wall -g -Isrc -I$(PREFIX)/include
+LDFLAGS = -L$(PREFIX)/lib $(libgl) -lm
 
 ifeq ($(shell uname -s), Darwin)
 	libgl = -framework OpenGL -framework GLUT
