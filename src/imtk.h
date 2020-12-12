@@ -85,6 +85,7 @@ void imtk_layout_advance(int width, int height);
 void imtk_layout_newline(void);
 void imtk_layout_get_pos(int *x, int *y);
 void imtk_layout_get_bounds(int *bbox);
+int imtk_layout_contains(int x, int y);
 
 /* defined in draw.c */
 void imtk_set_color(unsigned int col, float r, float g, float b, float a);

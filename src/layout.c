@@ -99,3 +99,14 @@ void imtk_layout_get_bounds(int *bbox)
 {
 	memcpy(bbox, st[top].box, sizeof st[top].box);
 }
+
+int imtk_layout_contains(int x, int y)
+{
+	if(x < st[top].box[0] || x >= st[top].box[0] + st[top].box[2]) {
+		return 0;
+	}
+	if(y < st[top].box[1] || y >= st[top].box[1] + st[top].box[3]) {
+		return 0;
+	}
+	return 1;
+}
