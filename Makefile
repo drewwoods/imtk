@@ -8,7 +8,7 @@ PREFIX = /usr/local
 
 CC = gcc
 AR = ar
-CFLAGS = -pedantic -Wall -g -Isrc -I$(PREFIX)/include
+CFLAGS = -std=gnu89 -pedantic -Wall -g -Isrc -I$(PREFIX)/include
 LDFLAGS = -L$(PREFIX)/lib $(libgl) -lm
 
 ifeq ($(shell uname -s), Darwin)
