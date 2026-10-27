@@ -1,3 +1,8 @@
+/*
+IMTK - simple C immediate mode GUI toolkit
+Copyright (C) 2010-2026  John Tsiombikas <nuclear@mutantstargoat.com>
+This is free software, released under the 2-clause BSD license.
+*/
 #ifndef DRAW_H_
 #define DRAW_H_
 
